@@ -3,6 +3,8 @@
 namespace WSUWP\New_Site_Defaults;
 
 add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_site_defaults', 10 );
+add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_project_site_defaults', 11, 3 ); // project.wsu.edu
+add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_sites_site_defaults', 11, 3 );   // sites.wsu.edu
 
 /**
  * Set the defaults used by sites created on the WSUWP Platform.
@@ -76,4 +78,135 @@ function set_site_defaults( $site_id ) {
 	}
 
 	restore_current_blog();
+}
+
+/**
+ * Preconfigure a Project site to reduce the overall setup experience.
+ *
+ * @since 0.0.1
+ *
+ * @param int    $site_id ID of the site being created.
+ * @param int    $user_id ID of the user creating the site.
+ * @param string $domain  Domain of the site being created.
+ */
+function set_project_site_defaults( $site_id, $user_id, $domain ) {
+
+	// Only apply these defaults to project sites.
+	if ( ! in_array( $domain, array( 'project.wsu.edu', 'project.wsu.dev' ), true ) ) {
+		return;
+	}
+
+	switch_to_blog( $site_id );
+
+	// Show posts on the front page rather than a page.
+	update_option( 'show_on_front', 'posts' );
+
+	// Activate the WSU Project theme by default.
+	update_option( 'stylesheet', 'p2-wsu' );
+	update_option( 'template', 'p2-wsu' );
+
+	// Restrict access to logged in users only.
+	update_option( 'blog_public', 2 );
+
+	// We're only prepared for SSL on production.
+	if ( 'project.wsu.edu' === $domain ) {
+		// Replace HTTP with HTTPS in the site and home URLs.
+		$site_url = get_option( 'siteurl' );
+		$site_url = str_replace( 'http://', 'https://', $site_url );
+		update_option( 'siteurl', $site_url );
+		$home_url = get_option( 'home' );
+		$home_url = str_replace( 'http://', 'https://', $home_url );
+		update_option( 'home', $home_url );
+	}
+
+	// Setup common P2 widgets.
+	update_option( 'widget_mention_me', array(
+		2 => array(
+			'title' => '',
+			'num_to_show' => 5,
+			'avatar_size' => 32,
+			'show_also_post_followups' => false,
+			'show_also_comment_followups' => false,
+		),
+		'_multiwidget' => 1,
+	) );
+
+	update_option( 'widget_p2_recent_tags', array(
+		2 => array(
+			'title' => '',
+			'num_to_show' => 15,
+		),
+		'_multiwidget' => 1,
+	) );
+
+	update_option( 'widget_p2_recent_comments', array(
+		2 => array(
+			'title' => '',
+			'num_to_show' => 5,
+			'avatar_size' => 32,
+		),
+		'_multiwidget' => 1,
+	) );
+
+	update_option( 'sidebars_widgets', array(
+		'wp_inactive_widgets' => array(),
+		'sidebar-1' => array(
+			0 => 'search-2',
+			1 => 'mention_me-2',
+			2 => 'p2_recent_tags-2',
+			3 => 'p2_recent_comments-2',
+			4 => 'recent-posts-2',
+		),
+		'sidebar-2' => array(),
+		'sidebar-3' => array(),
+		'array_version' => 3,
+	) );
+
+	wp_schedule_single_event( time() + 5, 'wsuwp_project_flush_rewrite_rules' );
+	wp_cache_delete( 'alloptions', 'options' );
+	restore_current_blog();
+
+	clean_blog_cache( $site_id );
+}
+
+/**
+ * Preconfigure a student portfolio site to reduce the overall setup experience.
+ *
+ * @since 0.0.1
+ *
+ * @param int    $site_id ID of the site being created.
+ * @param int    $user_id ID of the user creating the site.
+ * @param string $domain  Domain of the site being created.
+ */
+function set_sites_site_defaults( $site_id, $user_id, $domain ) {
+
+	// Only apply these defaults to sites sites. ;)
+	if ( ! in_array( $domain, array( 'sites.wsu.edu', 'sites.wsu.dev' ), true ) ) {
+		return;
+	}
+
+	switch_to_blog( $site_id );
+
+	// Show posts on the front page rather than a page. Sites are primarily for
+	// student portfolios and will likely have a log format.
+	update_option( 'show_on_front', 'posts' );
+
+	// Restrict access to logged in users only.
+	update_option( 'blog_public', 2 );
+
+	// We're prepared for SSL everywhere on production.
+	if ( 'sites.wsu.edu' === $domain ) {
+		// Replace HTTP with HTTPS in the site and home URLs.
+		$site_url = get_option( 'siteurl' );
+		$site_url = str_replace( 'http://', 'https://', $site_url );
+		update_option( 'siteurl', $site_url );
+		$home_url = get_option( 'home' );
+		$home_url = str_replace( 'http://', 'https://', $home_url );
+		update_option( 'home', $home_url );
+	}
+
+	wp_cache_delete( 'alloptions', 'options' );
+	restore_current_blog();
+
+	clean_blog_cache( $site_id );
 }

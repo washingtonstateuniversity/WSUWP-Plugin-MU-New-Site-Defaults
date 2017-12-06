@@ -6,6 +6,7 @@ add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_site_defaults', 11 );
 add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_project_site_defaults', 12, 3 );      // project.wsu.edu
 add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_sites_site_defaults', 12, 3 );        // sites.wsu.edu
 add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_crimsonpages_site_defaults', 10, 3 ); // crimpsonpages.org
+add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\delete_rewrite_rules', 99 );
 
 /**
  * Set the defaults used by sites created on the WSUWP Platform.
@@ -240,4 +241,15 @@ function set_crimsonpages_site_defaults( $site_id, $user_id, $domain ) {
 	restore_current_blog();
 
 	clean_blog_cache( $site_id );
+}
+
+/**
+ * Flush the rewrite rules immediately after site creation.
+ *
+ * @since 0.0.1
+ *
+ * @param int $site_id ID of the site being created.
+ */
+function delete_rewrite_rules( $site_id ) {
+	delete_blog_option( $site_id, 'rewrite_rules' );
 }

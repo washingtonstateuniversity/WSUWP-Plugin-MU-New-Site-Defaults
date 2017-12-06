@@ -43,6 +43,7 @@ function set_site_defaults( $site_id ) {
 	$post_id = wp_insert_post( array(
 		'post_type' => 'page',
 		'post_title' => 'News',
+		'post_status' => 'publish',
 		'post_content' => 'This is a placeholder page for news items. Editing is not recommended.',
 	) );
 

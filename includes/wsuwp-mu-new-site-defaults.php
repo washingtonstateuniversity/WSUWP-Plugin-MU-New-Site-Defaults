@@ -2,9 +2,10 @@
 
 namespace WSUWP\New_Site_Defaults;
 
-add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_site_defaults', 10 );
-add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_project_site_defaults', 11, 3 ); // project.wsu.edu
-add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_sites_site_defaults', 11, 3 );   // sites.wsu.edu
+add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_site_defaults', 11 );
+add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_project_site_defaults', 12, 3 );      // project.wsu.edu
+add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_sites_site_defaults', 12, 3 );        // sites.wsu.edu
+add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_crimsonpages_site_defaults', 10, 3 ); // crimpsonpages.org
 
 /**
  * Set the defaults used by sites created on the WSUWP Platform.
@@ -12,7 +13,6 @@ add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_sites_site_defaults', 
  * @since 0.0.1
  */
 function set_site_defaults( $site_id ) {
-
 	switch_to_blog( $site_id );
 
 	// Update the default category name to "General" from "Uncategorized".
@@ -180,7 +180,7 @@ function set_project_site_defaults( $site_id, $user_id, $domain ) {
  */
 function set_sites_site_defaults( $site_id, $user_id, $domain ) {
 
-	// Only apply these defaults to sites sites. ;)
+	// Only apply these defaults to sites sites.
 	if ( ! in_array( $domain, array( 'sites.wsu.edu', 'sites.wsu.dev' ), true ) ) {
 		return;
 	}
@@ -206,6 +206,37 @@ function set_sites_site_defaults( $site_id, $user_id, $domain ) {
 	}
 
 	wp_cache_delete( 'alloptions', 'options' );
+	restore_current_blog();
+
+	clean_blog_cache( $site_id );
+}
+
+/**
+ * Preconfigure a Crimson Pages student portfolio site to reduce the overall
+ * setup experience.
+ *
+ * @since 0.0.1
+ *
+ * @param int    $site_id ID of the site being created.
+ * @param int    $user_id ID of the user creating the site.
+ * @param string $domain  Domain of the site being created.
+ */
+function set_crimsonpages_site_defaults( $site_id, $user_id, $domain ) {
+
+	// Only apply these defaults to Crimson Pages sites.
+	if ( ! in_array( $domain, array( 'crimsonpages.org', 'crimsonpages.dev', 'crimsonpages.test' ), true ) ) {
+		return;
+	}
+
+	// Remove several things we do for new WSU branded sites.
+	remove_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_site_defaults', 11 );
+
+	switch_to_blog( $site_id );
+
+	// Activate Twenty Seventeen by default.
+	update_option( 'stylesheet', 'twentyseventeen' );
+	update_option( 'template', 'twentyseventeen' );
+
 	restore_current_blog();
 
 	clean_blog_cache( $site_id );

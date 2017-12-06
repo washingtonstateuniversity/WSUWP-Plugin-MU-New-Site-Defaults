@@ -9,7 +9,9 @@ add_action( 'wpmu_new_blog', 'WSUWP\New_Site_Defaults\set_site_defaults', 10 );
  *
  * @since 0.0.1
  */
-function set_site_defaults() {
+function set_site_defaults( $site_id ) {
+
+	switch_to_blog( $site_id );
 
 	// Update the default category name to "General" from "Uncategorized".
 	wp_update_term( 1, 'category', array(
@@ -72,4 +74,6 @@ function set_site_defaults() {
 			update_option( $size, absint( $val ) );
 		}
 	}
+
+	restore_current_blog();
 }

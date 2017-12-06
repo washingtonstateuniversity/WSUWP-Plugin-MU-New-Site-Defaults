@@ -20,7 +20,7 @@ function set_site_defaults( $site_id ) {
 	) );
 
 	// Delete the first comment auto-created by WordPress during install.
-	wp_delete_comment( 1 );
+	wp_delete_comment( 1, true );
 
 	// Update the title of the first post created by WordPress, "Hello World".
 	wp_update_post( array(

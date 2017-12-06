@@ -24,14 +24,14 @@ function set_site_defaults( $site_id ) {
 
 	// Update the title of the first post created by WordPress, "Hello World".
 	wp_update_post( array(
-		1,
+		'ID' => 1,
 		'post_title' => apply_filters( 'wsuwp_first_title', 'Sample Post' ),
 		'post_content' => apply_filters( 'wsuwp_first_post_content', '' ),
 	) );
 
 	// Update the title of the first page created by WordPress, "Sample Page".
 	wp_update_post( array(
-		2,
+		'ID' => 2,
 		'post_title' => apply_filters( 'wsuwp_first_page_title', 'Home Page' ),
 		'post_content' => apply_filters( 'wsuwp_first_page_content', '' ),
 	) );

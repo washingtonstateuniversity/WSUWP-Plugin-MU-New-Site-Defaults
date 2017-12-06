@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WSUWP MU New Site Defaults
-Version: 0.0.1
+Version: 0.0.2
 Description: A WordPress plugin that sets defaults for new sites created at WSU.
 Author: washingtonstateuniversity
 Author URI: https://web.wsu.edu/
